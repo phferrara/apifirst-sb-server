@@ -20,7 +20,7 @@ public class OpenApiValidationConfig {
 
         return new OpenApiValidationFilter(
                 true, // enable request validation
-                true  // enable response validation
+                false  // enable response validation
         );
     }
 
