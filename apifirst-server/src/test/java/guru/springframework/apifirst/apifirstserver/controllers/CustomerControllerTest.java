@@ -3,14 +3,18 @@ package guru.springframework.apifirst.apifirstserver.controllers;
 import guru.springframework.apifirst.model.AddressDto;
 import guru.springframework.apifirst.model.CustomerDto;
 import guru.springframework.apifirst.model.NameDto;
+import guru.springframework.apifirst.model.PaymentMethodDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -48,6 +52,25 @@ public class CustomerControllerTest extends BaseTest {
                         .content(objectMapper.writeValueAsString(customer)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"));
+    }
+
+    @Transactional
+    @DisplayName("Test Update Customer")
+    @Test
+    void testUpdateCustomer() throws Exception {
+        CustomerDto testCustomerDto = customerMapper.customerToDto(testCustomer);
+        testCustomerDto.setPaymentMethods(List.of(PaymentMethodDto.builder()
+                .displayName("My Card")
+                .cardNumber(1341234121)
+                .expiryMonth(12)
+                .expiryYear(2025)
+                .cvv(456).build()));
+
+        mockMvc.perform(put(CustomerController.BASE_URL + "/{customerId}", testCustomer.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testCustomerDto)))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.paymentMethods[0].cvv", equalTo(456)));
     }
 
     @DisplayName("Get by Id")

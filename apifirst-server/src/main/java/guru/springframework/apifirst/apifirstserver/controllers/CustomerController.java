@@ -30,6 +30,12 @@ public class CustomerController {
         return ResponseEntity.created(URI.create(BASE_URL + "/" + savedCustomer.getId())).build();
     }
 
+    @PutMapping("/{customerId}")
+    ResponseEntity<CustomerDto> updateNewCustomer(@PathVariable("customerId") UUID customerId, @RequestBody CustomerDto customer){
+        CustomerDto savedCustomer = customerService.updateCustomer(customerId, customer);
+        return ResponseEntity.ok(savedCustomer);
+    }
+
     @GetMapping
     public ResponseEntity<List<CustomerDto>> listCustomers(){
         return ResponseEntity.ok(customerService.listCustomers());

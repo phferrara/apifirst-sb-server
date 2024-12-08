@@ -13,9 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class CustomerServiceImplTest {
@@ -44,6 +44,35 @@ class CustomerServiceImplTest {
 
         assertEquals(customerDto.getName().getFirstName(), customer.getName().getFirstName());
 
+    }
+
+    @Transactional
+    @Test
+    void udpateCustomer() {
+        CustomerDto customerDto = createCustomerDTO();
+
+        CustomerDto savedCustomer = customerService.saveNewCustomer(customerDto);
+
+        assertNotNull(savedCustomer);
+        assertNotNull(savedCustomer.getId());
+
+        savedCustomer.setPhone(null);
+        savedCustomer.setPaymentMethods(List.of(PaymentMethodDto.builder()
+                .displayName("My Card")
+                .cardNumber(1341234121)
+                .expiryMonth(12)
+                .expiryYear(2025)
+                .cvv(456).build()));
+
+        CustomerDto updatedCustomer = customerService.updateCustomer(savedCustomer.getId(), savedCustomer);
+
+        PaymentMethodDto paymentMethod = updatedCustomer.getPaymentMethods().get(0);
+
+        assertNull(updatedCustomer.getPhone());
+        assertEquals(12, paymentMethod.getExpiryMonth());
+        assertEquals(2025, paymentMethod.getExpiryYear());
+        assertEquals(1341234121, paymentMethod.getCardNumber());
+        assertEquals(456, paymentMethod.getCvv());
     }
 
     @Test
