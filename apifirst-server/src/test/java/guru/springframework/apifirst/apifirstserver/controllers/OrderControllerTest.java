@@ -113,6 +113,13 @@ class OrderControllerTest extends BaseTest {
     }
 
     @Test
+    void getOrderByIdNotFound() throws Exception {
+        mockMvc.perform(get(OrderController.BASE_URL + "/{orderId}", UUID.randomUUID())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void getOrderById() throws Exception {
         mockMvc.perform(get(OrderController.BASE_URL + "/{orderId}", testOrder.getId())
                         .accept(MediaType.APPLICATION_JSON))

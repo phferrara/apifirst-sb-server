@@ -59,6 +59,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto getProductById(UUID productId) {
-        return productMapper.productToDto(productRepository.findById(productId).orElseThrow());
+        return productMapper.productToDto(productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product Not Found")));
     }
 }
